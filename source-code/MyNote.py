@@ -89,6 +89,7 @@ class Services:
         content=input("Enter your content:")
         query = "INSERT INTO db_mynote.mynote_data (id, content, label, due_date, archived) " \
                 "VALUES ('{}', '{}', DEFAULT, DEFAULT, DEFAULT)".format(mail, content)
+        mnCursor.execute(query)
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully added!")
 
@@ -97,6 +98,7 @@ class Services:
         content = input("Enter modified content: ")
         query = "UPDATE db_mynote.mynote_data t SET t.content = '{}' " \
                 "WHERE t.`id` = '{}' AND t.`index` = {}".format(content, mail, idx)
+        mnCursor.execute(query)
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully modified!")
 
@@ -104,6 +106,7 @@ class Services:
         idx = int(input("Enter ID no of the content: "))
         query = "UPDATE db_mynote.mynote_data t SET t.archived = 1 " \
                 "WHERE t.`id` = '{}' AND t.`index` = {}".format(mail, idx)
+        mnCursor.execute(query)
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully archived!")
 
@@ -111,8 +114,11 @@ class Services:
         idx = int(input("Enter ID no of the content: "))
         query = "UPDATE db_mynote.mynote_data t SET t.archived = 0 " \
                 "WHERE t.`id` = '{}' AND t.`index` = {}".format(mail, idx)
+        mnCursor.execute(query)
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully un-archived!")
+
+
 
 if __name__ == "__main__":
     """Landing Page"""
