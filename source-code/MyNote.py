@@ -127,6 +127,15 @@ class Services:
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully deleted!")
 
+    def editLabel(mail):
+        idx = int(input("Enter ID no of the content: "))
+        label = input("New Label: ")
+        query = "UPDATE db_mynote.mynote_data t SET t.label = '{}' " \
+                "WHERE `id` = '{}' AND t.`index` = {}".format(label, mail, idx)
+        mnCursor.execute(query)
+        connector.commit()
+        print(f"Hello, {mail}. Your content\'s label has been successfully modified!")
+
 if __name__ == "__main__":
     """Landing Page"""
     # Starting Appplication
