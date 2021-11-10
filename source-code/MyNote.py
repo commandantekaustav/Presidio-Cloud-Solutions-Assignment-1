@@ -72,15 +72,15 @@ def fetchMenu(mail):
         if (loginFlag):
             print(f"{mail} \'s Dashboard:")
             uChoice = input("1. Create Content.\n"
-                       "2. Edit Content.\n"
-                       "3. Edit Label.\n"
-                       "4. Edit Date.\n"
-                       "5. Find by Label.\n"
-                       "6. Show All.\n"
-                       "7. Archive.\n"
-                       "8. Delete by ID.\n"
-                       "9. Logout.\n"
-                       "0. Exit.\n")
+                            "2. Edit Content.\n"
+                            "3. Edit Label.\n"
+                            "4. Edit Date.\n"
+                            "5. Find by Label.\n"
+                            "6. Show All.\n"
+                            "7. Archive.\n"
+                            "8. Delete by ID.\n"
+                            "9. Logout.\n"
+                            "0. Exit.\n")
 
 
 
@@ -90,8 +90,15 @@ class Services:
         query = "INSERT INTO db_mynote.mynote_data (id, content, label, due_date, archived) " \
                 "VALUES ('{}', '{}', DEFAULT, DEFAULT, DEFAULT)".format(mail, content)
         connector.commit()
-        print(f"Hello, {mail}. Your content has been successfully added!",)
+        print(f"Hello, {mail}. Your content has been successfully added!")
 
+    def editContent(mail):
+        idx = int(input("Enter ID no of the content: "))
+        content = input("Enter modified content: ")
+        query = "UPDATE db_mynote.mynote_data t SET t.content = '{}' " \
+                "WHERE t.`id` = '{}' t.`index` = {}".format(content, mail, idx)
+        connector.commit()
+        print(f"Hello, {mail}. Your content has been successfully modified!")
 
 if __name__ == "__main__":
     """Landing Page"""
