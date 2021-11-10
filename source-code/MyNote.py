@@ -4,6 +4,7 @@ from mysql.connector import connect
 
 def start():
     connectDB()
+    landing()
 
 
 def connectDB():
@@ -66,6 +67,23 @@ def register(mail):
     print(f"User Registration is: {'Successful' if verification(mail) else 'Failed'}")
 
 
+def landing():
+    umail = input("Enter your mail id please:")
+    print(f"Hello, {umail}! Welcome to MyNote.")
+
+    if (verification(umail)):
+        if (login(umail)):
+            fetchMenu(umail)
+        else:
+            uChoice = int(input("Passwords did not match.\nPress 1 for Landing Page.. \n "
+                                "Press any other number for Registration."))
+            landing(umail) if (uChoice == 1) else register(umail)
+
+    else:
+        register(umail)
+        landing(umail)
+
+
 def fetchMenu(mail):
     """Menu Display and Service Invocation gateway."""
     opt = {1: Services.writeNote(mail), 0: exit()}
@@ -82,12 +100,13 @@ def fetchMenu(mail):
                             "8. Delete by ID.\n"
                             "9. Logout.\n"
                             "0. Exit.\n")
-
+            if (uChoice in opt.keys()):
+                opt[uChoice]
 
 
 class Services:
     def writeNote(mail):
-        content=input("Enter your content:")
+        content = input("Enter your content:")
         query = "INSERT INTO db_mynote.mynote_data (id, content, label, due_date, archived) " \
                 "VALUES ('{}', '{}', DEFAULT, DEFAULT, DEFAULT)".format(mail, content)
         mnCursor.execute(query)
@@ -136,48 +155,16 @@ class Services:
         connector.commit()
         print(f"Hello, {mail}. Your content\'s label has been successfully modified!")
 
+    def editDate(mail):
+        pass
+
+
 if __name__ == "__main__":
     """Landing Page"""
     # Starting Appplication
     start()
 
-    umail = input("Enter your mail id please:")
-    print(f"Hello, {umail}! Welcome to MyNote.")
-
-    if (verification(umail)):
-        while (not login(umail)):
-            print(
-                "Mistyped your password? Press 1 for retrying, Or,\nPress 2 for Opening a new account with a new Username.")
-            uChoice = int(input())
-            assert (uChoice == 1 or uChoice == 2), "Wrong Input"
-            if uChoice == 1:
-                login(umail)
-            else:
-                umail = input("Enter your mail id please:")
-                register(umail)
-
-        if (loginFlag): fetchMenu(umail)
-
-
-    else:
-        register(umail)
-        while (not login(umail)):
-            print(
-                "Mistyped your password? Press 1 for retrying, Or,\nPress 2 for Opening a new account with a new Username.")
-            uChoice = int(input())
-
-            assert (uChoice == 1 or uChoice == 2), "Wrong Input"
-            if uChoice == 1:
-                login(umail)
-            else:
-                umail = input("Enter your mail id please:")
-                register(umail)
-
-        while (True):
-            if (loginFlag):
-                fetchMenu(umail)
-
-        # login('asdadc@bca.com') if(verification('asdadc@bca.com')) else register('asdadc@bca.com')
+    # login('asdadc@bca.com') if(verification('asdadc@bca.com')) else register('asdadc@bca.com')
     # logout('asdadc@bca.com')
     # print(verification('abc@bca.com'))
     # print(verification('asdadc@bca.com'))
