@@ -67,6 +67,7 @@ def register(mail):
 
 
 def fetchMenu(mail):
+    """Menu Display and Service Invocation gateway."""
     opt = {1: Services.writeNote(mail), 0: exit()}
     while (True):
         if (loginFlag):
@@ -118,7 +119,13 @@ class Services:
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully un-archived!")
 
-
+    def delContent(mail):
+        idx = int(input("Enter ID no of the content: "))
+        query = "DELETE FROM db_mynote.mynote_data " \
+                "WHERE `id` = '{}' AND `index` = {}".format(mail, idx)
+        mnCursor.execute(query)
+        connector.commit()
+        print(f"Hello, {mail}. Your content has been successfully deleted!")
 
 if __name__ == "__main__":
     """Landing Page"""
