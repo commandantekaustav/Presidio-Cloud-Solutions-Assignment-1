@@ -15,34 +15,45 @@ Naming Conventions:
     3)
     4)
 """
-
-
-from mysql.connector import connect
-from Credentials import Root as rootCreds
-
-myServer = connect(host=rootCreds.host, user=rootCreds.username, passwd=rootCreds.password)
-print("Server has been successfully connected ")
-
-
-myCursor = myServer.cursor()
-myCursor.execute("show databases")
-currentDBs = [i[0] for i in myCursor.fetchall()]
-print(currentDBs)
-dbReady = 'db_mynote' in currentDBs
-
-if  dbReady:
-    print("Connection has been Established")
-else:
-    print("Creating Database...")
-    myCursor.execute("CREATE DATABASE DB_MyNote")
-
-
-
-
-
 """
 Selfcheck:
 * SQL is not case sensitive. That's why the Else block was executed.
 
 ?) How to handle the exceptions here
 """
+
+from mysql.connector import connect
+from Credentials import Root as rootCreds
+
+myDB = connect(host=rootCreds.host, user=rootCreds.username, passwd=rootCreds.password, database="db_mynote")
+print("Database has been successfully connected ")
+
+# creating a cursor object
+myCursor = myDB.cursor()
+
+"""     
+        # myCursor.execute("show databases")
+        # currentDBs = [i[0] for i in myCursor.fetchall()]
+        # print(currentDBs)
+        # dbReady = 'db_mynote' in currentDBs
+        # 
+        # # Database Connection Check
+        # if  dbReady:
+        #     print("Database Exists.")
+        # 
+        # else:
+        #     print("Creating Database...")
+        #     myCursor.execute("CREATE DATABASE db_mynote")
+        #     print("Database created.")
+        # 
+        # myDB = connect(host=rootCreds.host, user=rootCreds.username, passwd=rootCreds.password, database="db_mynote")
+        # myCursor.execute("USE db_mynote")
+        # print("Database Connected.")
+"""
+
+"""Default Table Creation"""
+# myCursor.execute("create table mynote_users (id VARCHAR(50), passkey VARCHAR(50))")
+
+# myCursor.execute("use db_mynote")
+myCursor.execute("show tables;")
+print(myCursor.fetchall())
