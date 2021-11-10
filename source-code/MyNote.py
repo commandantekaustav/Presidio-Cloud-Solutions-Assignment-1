@@ -96,9 +96,23 @@ class Services:
         idx = int(input("Enter ID no of the content: "))
         content = input("Enter modified content: ")
         query = "UPDATE db_mynote.mynote_data t SET t.content = '{}' " \
-                "WHERE t.`id` = '{}' t.`index` = {}".format(content, mail, idx)
+                "WHERE t.`id` = '{}' AND t.`index` = {}".format(content, mail, idx)
         connector.commit()
         print(f"Hello, {mail}. Your content has been successfully modified!")
+
+    def archiveContent(mail):
+        idx = int(input("Enter ID no of the content: "))
+        query = "UPDATE db_mynote.mynote_data t SET t.archived = 1 " \
+                "WHERE t.`id` = '{}' AND t.`index` = {}".format(mail, idx)
+        connector.commit()
+        print(f"Hello, {mail}. Your content has been successfully archived!")
+
+    def unarchiveContent(mail):
+        idx = int(input("Enter ID no of the content: "))
+        query = "UPDATE db_mynote.mynote_data t SET t.archived = 0 " \
+                "WHERE t.`id` = '{}' AND t.`index` = {}".format(mail, idx)
+        connector.commit()
+        print(f"Hello, {mail}. Your content has been successfully un-archived!")
 
 if __name__ == "__main__":
     """Landing Page"""
