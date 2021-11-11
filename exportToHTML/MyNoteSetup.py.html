@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>MyNoteSetup.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #629755; font-style: italic;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #cc7832;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MyNoteSetup.py</font>
+</center></td></tr></table>
+<pre><span class="s0">&quot;&quot;&quot; 
+Initial Setup for MyNote 
+------------------------ 
+Prerequisites: 
+    1) MySQL Workbench 8 
+    2) MySQL Connector (Python) 
+ 
+The Following Tasks will be performed: 
+    1) Creation of Database 
+    2) Server Connection 
+ 
+Naming Conventions: 
+    1) Classes in Camel 
+    2) Methods and Variables in Hungarian 
+    3) 
+    4) 
+&quot;&quot;&quot;</span>
+<span class="s2">&quot;&quot;&quot; 
+Selfcheck: 
+* SQL is not case sensitive. That's why the Else block was executed. 
+ 
+?) How to handle the exceptions here 
+&quot;&quot;&quot;</span>
+
+<span class="s3">from </span><span class="s1">mysql.connector </span><span class="s3">import </span><span class="s1">connect</span>
+<span class="s3">from </span><span class="s1">Credentials </span><span class="s3">import </span><span class="s1">Root </span><span class="s3">as </span><span class="s1">rootCreds</span>
+
+<span class="s1">myDB = connect(host=rootCreds.host</span><span class="s3">, </span><span class="s1">user=rootCreds.username</span><span class="s3">, </span><span class="s1">passwd=rootCreds.password</span><span class="s3">, </span><span class="s1">database=</span><span class="s2">&quot;db_mynote&quot;</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s2">&quot;Database has been successfully connected &quot;</span><span class="s1">)</span>
+
+<span class="s4"># creating a cursor object</span>
+<span class="s1">myCursor = myDB.cursor()</span>
+
+<span class="s2">&quot;&quot;&quot;      
+        # myCursor.execute(&quot;show databases&quot;) 
+        # currentDBs = [i[0] for i in myCursor.fetchall()] 
+        # print(currentDBs) 
+        # dbReady = 'db_mynote' in currentDBs 
+        #  
+        # # Database Connection Check 
+        # if  dbReady: 
+        #     print(&quot;Database Exists.&quot;) 
+        #  
+        # else: 
+        #     print(&quot;Creating Database...&quot;) 
+        #     myCursor.execute(&quot;CREATE DATABASE db_mynote&quot;) 
+        #     print(&quot;Database created.&quot;) 
+        #  
+        # myDB = connect(host=rootCreds.host, user=rootCreds.username, passwd=rootCreds.password, database=&quot;db_mynote&quot;) 
+        # myCursor.execute(&quot;USE db_mynote&quot;) 
+        # print(&quot;Database Connected.&quot;) 
+&quot;&quot;&quot;</span>
+
+<span class="s2">&quot;&quot;&quot;Default Table Creation&quot;&quot;&quot;</span>
+<span class="s4"># myCursor.execute(&quot;create table mynote_users (id VARCHAR(50), passkey VARCHAR(50))&quot;)</span>
+
+<span class="s4"># myCursor.execute(&quot;use db_mynote&quot;)</span>
+<span class="s1">myCursor.execute(</span><span class="s2">&quot;show tables;&quot;</span><span class="s1">)</span>
+<span class="s1">print(myCursor.fetchall())</span></pre>
+</body>
+</html>

@@ -78,8 +78,8 @@ def login(mail):
 
 def logout(mail):
     """Log out. Setting the active flag OFF."""
-    loginStatusUpdateQuery = "UPDATE db_mynote.mynote_users t SET t.login_status = 0 WHERE t.id LIKE '{}' ESCAPE '#' AND t.login_status = 1;".format(
-        mail)
+    loginStatusUpdateQuery = "UPDATE db_mynote.mynote_users t SET t.login_status = 0 " \
+                             "WHERE t.id LIKE '{}' ESCAPE '#' AND t.login_status = 1;".format(mail)
     mnCursor.execute(loginStatusUpdateQuery)
     connector.commit()
 
@@ -230,16 +230,22 @@ class Services:
 
     def findByLabel(mail):
         """Show all contents of a specific type."""
-        idx = int(input("Enter ID no of the content: "))
-        label = input("New Label: ")
+        label = input("Label to find: ")
         query = "SELECT * FROM db_mynote.mynote_data t " \
-                "WHERE t.`id` = {} AND t.`label` = '{}' AND t.`archived` = 0".format(mail, label)
+                "WHERE t.`id` = '{}' AND t.`label` = '{}' AND t.`archived` = 0;".format(mail, label)
         mnCursor.execute(query)
+        result = [x[2] for x in mnCursor.fetchall()]
+        for content_i in result:
+            print(content_i)
 
     def showAll(mail):
         """Print all the records of an User. (Which are not hiddent"""
-        query = "SELECT * FROM db_mynote.mynote_data t WHERE t.`id` = '{}' AND t.`archived` = 0".format(mail)
+        query = "SELECT * FROM db_mynote.mynote_data t " \
+                "WHERE t.id = '{}' AND t.archived = 0".format(mail)
         mnCursor.execute(query)
+        result = [x[2] for x in mnCursor.fetchall()]
+        for content_i in result:
+            print(content_i)
 
 if __name__ == "__main__":
     """Main Page"""

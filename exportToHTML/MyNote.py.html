@@ -1,0 +1,276 @@
+<html>
+<head>
+<title>MyNote.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #629755; font-style: italic;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #808080;}
+.s4 { color: #cc7832;}
+.s5 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MyNote.py</font>
+</center></td></tr></table>
+<pre><span class="s0">&quot;&quot;&quot; 
+Initial Setup for MyNote 
+------------------------ 
+Prerequisites: 
+    1) MySQL Workbench 8 
+    2) MySQL Connector (Python) 
+ 
+The Following Tasks will be performed: 
+    1) Creation of Database 
+    2) Server Connection 
+ 
+Naming Conventions: 
+    1) Classes in Camel 
+    2) Methods and Variables in Hungarian 
+    3) 
+    4) 
+&quot;&quot;&quot;</span>
+<span class="s2">&quot;&quot;&quot; 
+Selfcheck: 
+* SQL is not case sensitive. That's why the Else block was executed. 
+ 
+?) How to handle the exceptions here 
+ 
+Public Repo: 
+    Github: https://github.com/commandantekaustav/Presidio-Cloud-Solutions-Assignment-1 
+&quot;&quot;&quot;</span>
+
+<span class="s3"># Imports</span>
+<span class="s4">from </span><span class="s1">Credentials </span><span class="s4">import </span><span class="s1">Root </span><span class="s4">as </span><span class="s1">rootCreds</span>
+<span class="s4">from </span><span class="s1">mysql.connector </span><span class="s4">import </span><span class="s1">connect</span>
+
+<span class="s3">## Setting Up</span>
+<span class="s4">def </span><span class="s1">start():</span>
+    <span class="s0">&quot;&quot;&quot;All that needs to be done in the begining.&quot;&quot;&quot;</span>
+    <span class="s1">connectDB()</span>
+    <span class="s1">landing()</span>
+
+<span class="s4">def </span><span class="s1">connectDB():</span>
+    <span class="s0">&quot;&quot;&quot;Connects to the SQL Database&quot;&quot;&quot;</span>
+    <span class="s4">global </span><span class="s1">connector</span>
+    <span class="s1">connector = connect(host=rootCreds.host</span><span class="s4">, </span><span class="s1">user=rootCreds.username</span><span class="s4">, </span><span class="s1">passwd=rootCreds.password</span><span class="s4">, </span><span class="s1">database=</span><span class="s2">&quot;db_mynote&quot;</span><span class="s1">)</span>
+    <span class="s1">print(</span><span class="s2">&quot;DATABASE IS UP.&quot;</span><span class="s1">)</span>
+    <span class="s4">global </span><span class="s1">mnCursor</span>
+    <span class="s1">mnCursor = connector.cursor()</span>
+    <span class="s3"># mnCursor.execute('use db_mynote')</span>
+
+<span class="s3"># # Gateways</span>
+<span class="s4">def </span><span class="s1">verification(umail) -&gt; bool:</span>
+    <span class="s0">&quot;&quot;&quot;Checking if User account exists&quot;&quot;&quot;</span>
+    <span class="s1">mnCursor.execute(</span><span class="s2">&quot;select id from mynote_users&quot;</span><span class="s1">)</span>
+    <span class="s1">users = [u[</span><span class="s5">0</span><span class="s1">] </span><span class="s4">for </span><span class="s1">u </span><span class="s4">in </span><span class="s1">mnCursor.fetchall()]</span>
+    <span class="s1">vfStatus = umail </span><span class="s4">in </span><span class="s1">users</span>
+    <span class="s3"># print(f&quot;{umail} Verified.&quot; if vfStatus else f&quot;{umail} is an invalid Username&quot;)</span>
+    <span class="s4">return </span><span class="s1">vfStatus</span>
+
+<span class="s4">def </span><span class="s1">login(mail):</span>
+    <span class="s0">&quot;&quot;&quot;Log into the account with previously registered creds&quot;&quot;&quot;</span>
+    <span class="s4">global </span><span class="s1">loginFlag</span>
+    <span class="s1">loginFlag = </span><span class="s4">False</span>
+
+    <span class="s1">print(</span><span class="s2">f&quot;Welcome back, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">!&quot;</span><span class="s1">)</span>
+    <span class="s1">password = input(</span><span class="s2">&quot;Enter your password to log in to your account:&quot;</span><span class="s1">)</span>
+    <span class="s1">query = </span><span class="s2">&quot;SELECT passkey FROM mynote_users where id = '{}'&quot;</span><span class="s1">.format(mail)</span>
+    <span class="s1">mnCursor.execute(query)</span>
+    <span class="s1">gotPass = mnCursor.fetchall()[</span><span class="s5">0</span><span class="s1">][</span><span class="s5">0</span><span class="s1">]</span>
+    <span class="s4">if </span><span class="s1">gotPass == password:</span>
+        <span class="s1">loginStatusUpdateQuery = </span><span class="s2">&quot;UPDATE db_mynote.mynote_users t SET t.login_status = 1 WHERE t.id LIKE '{}' ESCAPE '#' &quot; </span><span class="s1">\</span>
+                                 <span class="s2">&quot;AND t.passkey LIKE '{}' ESCAPE '#' AND t.login_status = 0;&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">password)</span>
+        <span class="s1">mnCursor.execute(loginStatusUpdateQuery)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">&quot;Bingo! You have successfully logged in to your account!&quot;</span><span class="s1">)</span>
+        <span class="s1">loginFlag = </span><span class="s4">True</span>
+    <span class="s4">else</span><span class="s1">:</span>
+        <span class="s1">print(</span><span class="s2">&quot;Wrong Password!&quot;</span><span class="s1">)</span>
+        <span class="s1">loginFlag = </span><span class="s4">False</span>
+
+    <span class="s4">return </span><span class="s1">gotPass == password</span>
+
+<span class="s4">def </span><span class="s1">logout(mail):</span>
+    <span class="s0">&quot;&quot;&quot;Log out. Setting the active flag OFF.&quot;&quot;&quot;</span>
+    <span class="s1">loginStatusUpdateQuery = </span><span class="s2">&quot;UPDATE db_mynote.mynote_users t SET t.login_status = 0 WHERE t.id LIKE '{}' ESCAPE '#' AND t.login_status = 1;&quot;</span><span class="s1">.format(</span>
+        <span class="s1">mail)</span>
+    <span class="s1">mnCursor.execute(loginStatusUpdateQuery)</span>
+    <span class="s1">connector.commit()</span>
+
+    <span class="s4">global </span><span class="s1">loginFlag</span>
+    <span class="s1">loginFlag = </span><span class="s4">False</span>
+    <span class="s1">print(</span><span class="s2">&quot;Bingo! You have successfully logged out from your account!&quot;</span><span class="s1">)</span>
+
+
+<span class="s4">def </span><span class="s1">register(mail):</span>
+    <span class="s0">&quot;&quot;&quot;Registration of new customers. Recording in DB.&quot;&quot;&quot;</span>
+    <span class="s4">if </span><span class="s1">(verification(mail)):</span>
+        <span class="s1">print(</span><span class="s2">&quot;Account already exists.&quot;</span><span class="s1">)</span>
+        <span class="s1">landing()</span>
+    <span class="s4">else</span><span class="s1">:</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Welcome to the registration process, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">!&quot;</span><span class="s1">)</span>
+        <span class="s1">password = input(</span><span class="s2">&quot;Enter your password:&quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;INSERT INTO db_mynote.mynote_users (id, passkey) VALUES ('{}', '{}')&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">password)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;User Registration is: </span><span class="s4">{</span><span class="s2">'Successful' </span><span class="s4">if </span><span class="s1">verification(mail) </span><span class="s4">else </span><span class="s2">'Failed'</span><span class="s4">}</span><span class="s2">&quot;</span><span class="s1">)</span>
+
+<span class="s3"># # Menu Handling</span>
+<span class="s4">def </span><span class="s1">landing():</span>
+    <span class="s0">&quot;&quot;&quot;Login-Reg Page&quot;&quot;&quot;</span>
+    <span class="s1">umail = input(</span><span class="s2">&quot;Enter your mail id please:&quot;</span><span class="s1">)</span>
+    <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">umail</span><span class="s4">}</span><span class="s2">! Welcome to MyNote.&quot;</span><span class="s1">)</span>
+
+    <span class="s4">if </span><span class="s1">(verification(umail)):</span>
+        <span class="s4">if </span><span class="s1">(login(umail)):</span>
+            <span class="s1">fetchMenu(umail)</span>
+        <span class="s4">else</span><span class="s1">:</span>
+            <span class="s1">print(</span><span class="s2">&quot;Passwords did not match&quot;</span><span class="s1">)</span>
+            <span class="s1">landing()</span>
+
+    <span class="s4">else</span><span class="s1">:</span>
+        <span class="s1">register(umail)</span>
+        <span class="s1">landing()</span>
+
+<span class="s4">def </span><span class="s1">fetchMenu(mail):</span>
+    <span class="s0">&quot;&quot;&quot;Menu Display and Service Invocation gateway.&quot;&quot;&quot;</span>
+
+    <span class="s4">while </span><span class="s1">loginFlag:</span>
+        <span class="s1">print(</span><span class="s2">&quot;1. Create Content.</span><span class="s4">\t </span><span class="s2">2. Edit Content.</span><span class="s4">\t  </span><span class="s2">3. Edit Label.</span><span class="s4">\t    </span><span class="s2">4. Edit Date.</span><span class="s4">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;5. Find by Label.</span><span class="s4">\t  </span><span class="s2">6. Archive.</span><span class="s4">\t  </span><span class="s2">7. Unarchive.</span><span class="s4">\t   </span><span class="s2">8. Delete by ID.</span><span class="s4">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;9. Show all records.</span><span class="s4">\t </span><span class="s2">10. Logout.</span><span class="s4">\t         </span><span class="s2">0. Exit.</span><span class="s4">\t</span><span class="s2">&quot;</span><span class="s1">)</span>
+
+        <span class="s4">if </span><span class="s1">loginFlag:</span>
+            <span class="s1">print(</span><span class="s2">f&quot;</span><span class="s4">{</span><span class="s1">mail</span><span class="s4">} \'</span><span class="s2">s Dashboard:&quot;</span><span class="s1">)</span>
+            <span class="s1">uChoice = int(input(</span><span class="s2">&quot;Choice: &quot;</span><span class="s1">))</span>
+            <span class="s4">if </span><span class="s1">uChoice == </span><span class="s5">1</span><span class="s1">:</span>
+                <span class="s1">Services.writeNote(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">2</span><span class="s1">:</span>
+                <span class="s1">Services.editContent(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">3</span><span class="s1">:</span>
+                <span class="s1">Services.editLabel(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">4</span><span class="s1">:</span>
+                <span class="s1">Services.editDate(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">5</span><span class="s1">:</span>
+                <span class="s1">Services.findByLabel(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">6</span><span class="s1">:</span>
+                <span class="s1">Services.archiveContent(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">7</span><span class="s1">:</span>
+                <span class="s1">Services.unarchiveContent(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">8</span><span class="s1">:</span>
+                <span class="s1">Services.delContent(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">9</span><span class="s1">:</span>
+                <span class="s1">Services.showAll(mail)</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">10</span><span class="s1">:</span>
+                <span class="s1">logout(mail)</span>
+                <span class="s1">landing()</span>
+            <span class="s4">elif </span><span class="s1">uChoice == </span><span class="s5">0</span><span class="s1">:</span>
+                <span class="s1">exit()</span>
+            <span class="s4">else</span><span class="s1">:</span>
+                <span class="s1">print(</span><span class="s2">&quot;Wrong Choice! &quot;</span><span class="s1">)</span>
+                <span class="s1">fetchMenu(mail)</span>
+
+
+
+<span class="s4">class </span><span class="s1">Services:</span>
+    <span class="s0">&quot;&quot;&quot;List of all services provided by the note taking app.&quot;&quot;&quot;</span>
+
+    <span class="s4">def </span><span class="s1">writeNote(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Create a Note&quot;&quot;&quot;</span>
+        <span class="s1">content = input(</span><span class="s2">&quot;Enter your content:&quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;INSERT INTO db_mynote.mynote_data (id, content, label, due_date, archived) &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;VALUES ('{}', '{}', DEFAULT, DEFAULT, DEFAULT)&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">content)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content has been successfully added!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">editContent(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Edit a note.&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">content = input(</span><span class="s2">&quot;Enter modified content: &quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;UPDATE db_mynote.mynote_data t SET t.content = '{}' &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE t.`id` = '{}' AND t.`index` = {}&quot;</span><span class="s1">.format(content</span><span class="s4">, </span><span class="s1">mail</span><span class="s4">, </span><span class="s1">idx)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content has been successfully modified!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">archiveContent(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Hiding contents; Default: Shown&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">query = </span><span class="s2">&quot;UPDATE db_mynote.mynote_data t SET t.archived = 1 &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE t.`id` = '{}' AND t.`index` = {}&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">idx)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content has been successfully archived!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">unarchiveContent(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Unhiding Contents&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">query = </span><span class="s2">&quot;UPDATE db_mynote.mynote_data t SET t.archived = 0 &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE t.`id` = '{}' AND t.`index` = {}&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">idx)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content has been successfully un-archived!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">delContent(mail):</span>
+        <span class="s0">&quot;&quot;&quot;&quot;Deleting particular contents&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">query = </span><span class="s2">&quot;DELETE FROM db_mynote.mynote_data &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE `id` = '{}' AND `index` = {}&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">idx)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content has been successfully deleted!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">editLabel(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Editing the label of a specific content&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">label = input(</span><span class="s2">&quot;New Label: &quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;UPDATE db_mynote.mynote_data t SET t.label = '{}' &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE `id` = '{}' AND t.`index` = {}&quot;</span><span class="s1">.format(label</span><span class="s4">, </span><span class="s1">mail</span><span class="s4">, </span><span class="s1">idx)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content</span><span class="s4">\'</span><span class="s2">s label has been successfully modified!&quot;</span><span class="s1">)</span>
+
+    <span class="s4">def </span><span class="s1">editDate(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Editing the date of a specific content&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">newDate = input(</span><span class="s2">&quot;Enter new Date in the following format: YYYY-MM-DD&quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;UPDATE db_mynote.mynote_data t SET t.due_date = '{}' &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE t.`index` = {} AND t.`id` = '{}'&quot;</span><span class="s1">.format(newDate</span><span class="s4">, </span><span class="s1">idx</span><span class="s4">, </span><span class="s1">mail)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+        <span class="s1">connector.commit()</span>
+        <span class="s1">print(</span><span class="s2">f&quot;Hello, </span><span class="s4">{</span><span class="s1">mail</span><span class="s4">}</span><span class="s2">. Your content</span><span class="s4">\'</span><span class="s2">s date has been successfully modified!&quot;</span><span class="s1">)</span>
+
+
+    <span class="s4">def </span><span class="s1">findByLabel(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Show all contents of a specific type.&quot;&quot;&quot;</span>
+        <span class="s1">idx = int(input(</span><span class="s2">&quot;Enter ID no of the content: &quot;</span><span class="s1">))</span>
+        <span class="s1">label = input(</span><span class="s2">&quot;New Label: &quot;</span><span class="s1">)</span>
+        <span class="s1">query = </span><span class="s2">&quot;SELECT * FROM db_mynote.mynote_data t &quot; </span><span class="s1">\</span>
+                <span class="s2">&quot;WHERE t.`id` = {} AND t.`label` = '{}' AND t.`archived` = 0&quot;</span><span class="s1">.format(mail</span><span class="s4">, </span><span class="s1">label)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+
+    <span class="s4">def </span><span class="s1">showAll(mail):</span>
+        <span class="s0">&quot;&quot;&quot;Print all the records of an User. (Which are not hiddent&quot;&quot;&quot;</span>
+        <span class="s1">query = </span><span class="s2">&quot;SELECT * FROM db_mynote.mynote_data t WHERE t.`id` = '{}' AND t.`archived` = 0&quot;</span><span class="s1">.format(mail)</span>
+        <span class="s1">mnCursor.execute(query)</span>
+
+<span class="s4">if </span><span class="s1">__name__ == </span><span class="s2">&quot;__main__&quot;</span><span class="s1">:</span>
+    <span class="s2">&quot;&quot;&quot;Main Page&quot;&quot;&quot;</span>
+    <span class="s3"># Starting Appplication</span>
+    <span class="s1">start()</span>
+
+    <span class="s3"># login('asdadc@bca.com') if(verification('asdadc@bca.com')) else register('asdadc@bca.com')</span>
+    <span class="s3"># logout('asdadc@bca.com')</span>
+    <span class="s3"># print(verification('abc@bca.com'))</span>
+    <span class="s3"># print(verification('asdadc@bca.com'))</span>
+    <span class="s3"># register('asdadc@bca.com')</span>
+    <span class="s3"># login('asdadc@bca.com')</span>
+</pre>
+</body>
+</html>
