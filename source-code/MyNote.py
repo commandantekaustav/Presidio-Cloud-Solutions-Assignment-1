@@ -54,17 +54,23 @@ def logout(mail):
         mail)
     mnCursor.execute(loginStatusUpdateQuery)
     connector.commit()
+
+    global loginFlag
     loginFlag = False
     print("Bingo! You have successfully logged out from your account!")
 
 
 def register(mail):
-    print(f"Welcome to the registration process, {mail}!")
-    password = input("Enter your password:")
-    query = "INSERT INTO db_mynote.mynote_users (id, passkey) VALUES ('{}', '{}')".format(mail, password)
-    mnCursor.execute(query)
-    connector.commit()
-    print(f"User Registration is: {'Successful' if verification(mail) else 'Failed'}")
+    if (verification(mail)):
+        print("Account already exists.")
+        landing(mail)
+    else:
+        print(f"Welcome to the registration process, {mail}!")
+        password = input("Enter your password:")
+        query = "INSERT INTO db_mynote.mynote_users (id, passkey) VALUES ('{}', '{}')".format(mail, password)
+        mnCursor.execute(query)
+        connector.commit()
+        print(f"User Registration is: {'Successful' if verification(mail) else 'Failed'}")
 
 
 def landing():
@@ -75,34 +81,55 @@ def landing():
         if (login(umail)):
             fetchMenu(umail)
         else:
-            uChoice = int(input("Passwords did not match.\nPress 1 for Landing Page.. \n "
-                                "Press any other number for Registration."))
-            landing(umail) if (uChoice == 1) else register(umail)
+            print("Passwords did not match")
+            landing()
 
     else:
         register(umail)
-        landing(umail)
+        if (login(umail)):
+            fetchMenu(umail)
+        else:
+            print("Passwords did not match")
+            landing()
 
 
 def fetchMenu(mail):
     """Menu Display and Service Invocation gateway."""
-    opt = {1: Services.writeNote(mail), 0: exit()}
-    while (True):
-        if (loginFlag):
-            print(f"{mail} \'s Dashboard:")
-            uChoice = input("1. Create Content.\n"
-                            "2. Edit Content.\n"
-                            "3. Edit Label.\n"
-                            "4. Edit Date.\n"
-                            "5. Find by Label.\n"
-                            "6. Show All.\n"
-                            "7. Archive.\n"
-                            "8. Delete by ID.\n"
-                            "9. Logout.\n"
-                            "0. Exit.\n")
-            if (uChoice in opt.keys()):
-                opt[uChoice]
 
+    while loginFlag:
+        print("1. Create Content.\t 2. Edit Content.\t  3. Edit Label.\t    4. Edit Date.\n"
+              "5. Find by Label.\t  6. Archive.\t  7. Unarchive.\t   8. Delete by ID.\n"
+              "9. Show all records.\t 10. Logout.\t         0. Exit.\t")
+
+        if loginFlag:
+            print(f"{mail} \'s Dashboard:")
+            uChoice = int(input("Choice: "))
+            if uChoice == 1:
+                Services.writeNote(mail)
+            elif uChoice == 2:
+                Services.editContent(mail)
+            elif uChoice == 3:
+                Services.editLabel()
+            elif uChoice == 4:
+                Services.editDate()
+            elif uChoice == 5:
+                pass
+            elif uChoice == 6:
+                pass
+            elif uChoice == 7:
+                pass
+            elif uChoice == 8:
+                pass
+            elif uChoice == 9:
+                pass
+            elif uChoice == 10:
+                logout(mail)
+                landing()
+            elif uChoice == 0:
+                exit()
+            else:
+                print("Wrong Choice! ")
+                fetchMenu(mail)
 
 class Services:
     def writeNote(mail):
